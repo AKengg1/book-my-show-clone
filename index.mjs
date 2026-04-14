@@ -11,6 +11,10 @@ import pg from "pg";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
+import dotenv from "dotenv";
+import { decode } from "punycode";
+
+dotenv.config();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -33,19 +37,74 @@ const pool = new pg.Pool({
 
 const app = new express();
 app.use(cors());
+app.use(express.json());
+
+const requireAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer "))
+    return res.status(401).send({ error: "Unauthorized: missing token" });
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res
+      .status(401)
+      .send({ error: "Unauthorized: invalid or expired token" });
+  }
+};
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
+
+app.post("/register", async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password)
+      return res
+        .status(400)
+        .json({ error: "Name, email and password are required." });
+
+    if (password.length < 6)
+      return res
+        .status(400)
+        .json({ error: "Password must be at least 6 characters." });
+    //check if user exists
+    const existing = await pool.query("SELECT id FROM users WHERE email = $1", [
+      email,
+    ]);
+    if (existing.rowCount > 0)
+      return res.status(409).json({ error: "Email already registered." });
+
+    //hash password
+    const hashPassword = await bcrypt.hash(password, 10);
+    const result = await pool.query(
+      "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email",
+      [name, email, hashPassword],
+    );
+    const user = result.rows[0];
+    const token = jwt.sign(
+      { id: user.id, name: user.name, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" },
+    );
+    res.status(201).send({ token, name: user.name, email: user.email });
+  } catch (error) {
+    req.status(500).send({ error: "Internal server error." });
+  }
+});
+
 //get all seats
-app.get("/seats", async (req, res) => {
+app.get("/seats", requireAuth, async (req, res) => {
   const result = await pool.query("select * from seats"); // equivalent to Seats.find() in mongoose
   res.send(result.rows);
 });
 
 //book a seat give the seatId and your name
 
-app.put("/:id/:name", async (req, res) => {
+app.put("/:id/:name", requireAuth, async (req, res) => {
   try {
     const id = req.params.id;
     const name = req.params.name;
