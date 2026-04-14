@@ -142,4 +142,6 @@ app.put("/:id/:name", requireAuth, async (req, res) => {
   }
 });
 
-app.listen(port, () => console.log("Server starting on port: " + port));
+app.listen(port, () =>
+  console.log(`Server starting on port http://localhost:${port}`),
+);
