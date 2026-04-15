@@ -12,130 +12,336 @@
         background-color: #0f172a;
         color: #f8fafc;
       }
+      .input-field {
+        width: 100%;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(71, 85, 105, 0.5);
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: #f8fafc;
+        font-family: "Outfit", sans-serif;
+        font-size: 1rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        outline: none;
+      }
+      .input-field:focus {
+        border-color: rgba(52, 211, 153, 0.6);
+        box-shadow: 0 0 0 3px rgba(52, 211, 153, 0.1);
+      }
+      .input-field::placeholder {
+        color: rgba(148, 163, 184, 0.5);
+      }
+      .btn-primary {
+        width: 100%;
+        background: linear-gradient(135deg, #10b981, #06b6d4);
+        color: white;
+        font-weight: 700;
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+        border: none;
+        cursor: pointer;
+        font-family: "Outfit", sans-serif;
+        font-size: 1rem;
+        transition: opacity 0.2s, transform 0.1s;
+      }
+      .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+      .btn-primary:active { transform: scale(0.98); }
+      .error-msg {
+        color: #f87171;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        min-height: 1.25rem;
+      }
     </style>
   </head>
-  <body
-    class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
-  >
-    <div
-      class="max-w-7xl w-full bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl p-10 border border-slate-700/50"
-    >
-      <div class="text-center mb-10">
-        <h1
-          class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 mb-4 tracking-tight"
-        >
-          ChaiCode Cinema - Now Showing<br />
-          <br />
-          <span class="text-red-400">
-            <span class="font-bold">Dhurandhar The Revenge</span>
-          </span>
+  <body class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+
+    <!-- ========== AUTH SCREEN ========== -->
+    <div id="auth-screen" class="w-full max-w-md">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 mb-2 tracking-tight">
+          ChaiCode Cinema
         </h1>
-        <p class="text-slate-400 text-lg">Jassi ko ghar ki yaad kyu nhi aai?</p>
+        <p class="text-slate-400">Sign in to book your seat</p>
       </div>
 
+      <div class="bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 border border-slate-700/50">
+
+        <!-- Tabs -->
+        <div class="flex bg-slate-900/50 rounded-2xl p-1 mb-6 border border-slate-700">
+          <button id="tab-login" onclick="switchTab('login')"
+            class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-200 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white">
+            Login
+          </button>
+          <button id="tab-register" onclick="switchTab('register')"
+            class="flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-200 text-slate-400 hover:text-slate-200">
+            Register
+          </button>
+        </div>
+
+        <!-- Login Form -->
+        <div id="login-form">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-slate-300 text-sm font-semibold mb-1">Email</label>
+              <input id="login-email" class="input-field" type="email" placeholder="you@example.com" />
+            </div>
+            <div>
+              <label class="block text-slate-300 text-sm font-semibold mb-1">Password</label>
+              <input id="login-password" class="input-field" type="password" placeholder="••••••••" />
+            </div>
+            <p id="login-error" class="error-msg"></p>
+            <button class="btn-primary" onclick="doLogin()">Sign In</button>
+          </div>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" class="hidden">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-slate-300 text-sm font-semibold mb-1">Full Name</label>
+              <input id="reg-name" class="input-field" type="text" placeholder="Jassi Kumar" />
+            </div>
+            <div>
+              <label class="block text-slate-300 text-sm font-semibold mb-1">Email</label>
+              <input id="reg-email" class="input-field" type="email" placeholder="you@example.com" />
+            </div>
+            <div>
+              <label class="block text-slate-300 text-sm font-semibold mb-1">Password</label>
+              <input id="reg-password" class="input-field" type="password" placeholder="Min. 6 characters" />
+            </div>
+            <p id="reg-error" class="error-msg"></p>
+            <button class="btn-primary" onclick="doRegister()">Create Account</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== BOOKING SCREEN ========== -->
+    <div id="booking-screen" class="hidden max-w-7xl w-full bg-slate-800/80 backdrop-blur-xl rounded-3xl shadow-2xl p-10 border border-slate-700/50">
+      
+      <!-- Header bar -->
+      <div class="flex items-center justify-between mb-6">
+        <div></div>
+        <div class="text-center">
+          <h1 class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 mb-1 tracking-tight">
+            ChaiCode Cinema - Now Showing<br/>
+            <span class="text-red-400"><span class="font-bold">Dhurandhar The Revenge</span></span>
+          </h1>
+          <p class="text-slate-400 text-lg">Jassi ko ghar ki yaad kyu nhi aai?</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="user-label" class="text-slate-400 text-sm"></span>
+          <button onclick="doLogout()"
+            class="text-sm font-semibold text-rose-400 hover:text-rose-300 border border-rose-500/30 hover:border-rose-400/50 px-4 py-1.5 rounded-xl transition-all">
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <!-- Legend -->
       <div class="flex justify-center mb-10">
-        <div
-          class="bg-slate-900/50 rounded-full px-6 py-3 border border-slate-700 flex gap-8 items-center"
-        >
+        <div class="bg-slate-900/50 rounded-full px-6 py-3 border border-slate-700 flex gap-8 items-center">
           <div class="flex items-center gap-3">
-            <div
-              class="w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]"
-            ></div>
-            <span class="text-slate-300 font-medium tracking-wide"
-              >Available</span
-            >
+            <div class="w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]"></div>
+            <span class="text-slate-300 font-medium tracking-wide">Available</span>
           </div>
           <div class="w-px h-6 bg-slate-700"></div>
           <div class="flex items-center gap-3">
-            <div
-              class="w-4 h-4 rounded-full bg-rose-500/20 border border-rose-500/50"
-            ></div>
+            <div class="w-4 h-4 rounded-full bg-rose-500/20 border border-rose-500/50"></div>
             <span class="text-slate-400 font-medium tracking-wide">Booked</span>
           </div>
         </div>
       </div>
 
+      <!-- Seats Table -->
       <div class="flex justify-center">
-        <div
-          class="bg-slate-900/40 p-8 rounded-2xl border border-slate-700/50 shadow-inner"
-        >
-          <table
-            id="tbl"
-            class="border-separate border-spacing-4 mx-auto"
-          ></table>
+        <div class="bg-slate-900/40 p-8 rounded-2xl border border-slate-700/50 shadow-inner">
+          <table id="tbl" class="border-separate border-spacing-4 mx-auto"></table>
         </div>
       </div>
     </div>
 
     <script>
-      async function run() {
-        const tbl = document.getElementById("tbl");
-        const res = await fetch("/seats");
+      // TAB SWITCHING
+      function switchTab(tab) {
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const tabLogin = document.getElementById('tab-login');
+        const tabRegister = document.getElementById('tab-register');
+
+        const activeClass = 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-white';
+        const inactiveClass = 'text-slate-400 hover:text-slate-200';
+
+        if (tab === 'login') {
+          loginForm.classList.remove('hidden');
+          registerForm.classList.add('hidden');
+          tabLogin.className = `flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${activeClass}`;
+          tabRegister.className = `flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${inactiveClass}`;
+        } else {
+          loginForm.classList.add('hidden');
+          registerForm.classList.remove('hidden');
+          tabRegister.className = `flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${activeClass}`;
+          tabLogin.className = `flex-1 py-2 rounded-xl font-semibold text-sm transition-all duration-200 ${inactiveClass}`;
+        }
+      }
+
+      // AUTH HELPERS
+      function getToken() { return localStorage.getItem('token'); }
+      function setToken(t) { localStorage.setItem('token', t); }
+      function clearToken() { localStorage.removeItem('token'); localStorage.removeItem('username'); }
+
+      async function doRegister() {
+        const name = document.getElementById('reg-name').value.trim();
+        const email = document.getElementById('reg-email').value.trim();
+        const password = document.getElementById('reg-password').value;
+        const errEl = document.getElementById('reg-error');
+        errEl.textContent = '';
+
+        if (!name || !email || !password) { errEl.textContent = 'All fields are required.'; return; }
+        if (password.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; return; }
+
+        try {
+          const res = await fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password })
+          });
+          const data = await res.json();
+          if (data.error) { errEl.textContent = data.error; return; }
+          // Auto-login after register
+          setToken(data.token);
+          localStorage.setItem('username', data.name);
+          showBookingScreen(data.name);
+        } catch (e) {
+          errEl.textContent = 'Network error. Try again.';
+        }
+      }
+
+      async function doLogin() {
+        const email = document.getElementById('login-email').value.trim();
+        const password = document.getElementById('login-password').value;
+        const errEl = document.getElementById('login-error');
+        errEl.textContent = '';
+
+        if (!email || !password) { errEl.textContent = 'Email and password are required.'; return; }
+
+        try {
+          const res = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          const data = await res.json();
+          if (data.error) { errEl.textContent = data.error; return; }
+          setToken(data.token);
+          localStorage.setItem('username', data.name);
+          showBookingScreen(data.name);
+        } catch (e) {
+          errEl.textContent = 'Network error. Try again.';
+        }
+      }
+
+      function doLogout() {
+        clearToken();
+        document.getElementById('booking-screen').classList.add('hidden');
+        document.getElementById('auth-screen').classList.remove('hidden');
+        document.getElementById('tbl').innerHTML = '';
+      }
+
+      // BOOKING SCREEN
+      function showBookingScreen(name) {
+        document.getElementById('auth-screen').classList.add('hidden');
+        document.getElementById('booking-screen').classList.remove('hidden');
+        document.getElementById('user-label').textContent = `hii ${name}`;
+        loadSeats();
+      }
+
+      async function loadSeats() {
+        const tbl = document.getElementById('tbl');
+        tbl.innerHTML = '';
+
+        const res = await fetch('/seats', {
+          headers: { 'Authorization': `Bearer ${getToken()}` }
+        });
+
+        if (res.status === 401) { doLogout(); return; }
+
         const resarray = await res.json();
         const j = resarray.sort((a, b) => a.id - b.id);
         let tr;
+
         for (let i = 0; i < j.length; i++) {
-          if (i % 8 === 0) tr = document.createElement("tr");
+          if (i % 8 === 0) tr = document.createElement('tr');
 
-          const td = document.createElement("td");
-
-          // Base aesthetic classes - added 'relative group' for tooltip positioning
-          const baseClasses =
-            "w-32 h-32 rounded-2xl text-center align-middle text-2xl font-bold transition-all duration-300 select-none relative group";
+          const td = document.createElement('td');
+          const baseClasses = 'w-32 h-32 rounded-2xl text-center align-middle text-2xl font-bold transition-all duration-300 select-none relative group';
 
           if (j[i].isbooked) {
             td.className = `${baseClasses} bg-rose-500/10 text-rose-500/60 border border-rose-500/20 cursor-not-allowed`;
             td.innerHTML = `
-                    <span class="relative z-10">${j[i].id}</span>
-                    <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-4 py-2 bg-slate-900 border border-slate-700 text-sm text-slate-300 rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap shadow-2xl z-50 pointer-events-none font-normal shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
-                        Booked by: <span class="font-bold text-white ml-1">${j[i].name}</span>
-                        <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-[6px] border-transparent border-t-slate-700"></div>
-                        <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[2px] border-[5px] border-transparent border-t-slate-900"></div>
-                    </div>
-                `;
+              <span class="relative z-10">${j[i].id}</span>
+              <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-4 py-2 bg-slate-900 border border-slate-700 text-sm text-slate-300 rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap shadow-2xl z-50 pointer-events-none font-normal">
+                Booked by: <span class="font-bold text-white ml-1">${j[i].name}</span>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-[6px] border-transparent border-t-slate-700"></div>
+                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[2px] border-[5px] border-transparent border-t-slate-900"></div>
+              </div>`;
           } else {
-            td.className = `${baseClasses} bg-emerald-500 text-white border-2 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)] cursor-pointer hover:bg-emerald-400 hover:-translate-y-1.5 hover:shadow-[0_10px_25px_rgba(16,185,129,0.5)] active:scale-95 active:shadow-[0_0_10px_rgba(16,185,129,0.3)]`;
+            td.className = `${baseClasses} bg-emerald-500 text-white border-2 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)] cursor-pointer hover:bg-emerald-400 hover:-translate-y-1.5 hover:shadow-[0_10px_25px_rgba(16,185,129,0.5)] active:scale-95`;
             td.innerHTML = `<span class="relative z-10">${j[i].id}</span>`;
           }
 
-          td.addEventListener("click", async function (e) {
+          td.addEventListener('click', async function (e) {
             const currentTd = e.currentTarget;
-            if (currentTd.classList.contains("cursor-not-allowed")) {
-              return; // Seat is already taken
-            }
+            if (currentTd.classList.contains('cursor-not-allowed')) return;
 
             try {
-              const id = j[i].id; // Safe from loop closure
-              const name = prompt("Enter your name");
-              if (!name) return;
+              const id = j[i].id;
+              // Use logged-in user's name automatically
+              const username = localStorage.getItem('username') || 'Guest';
+              const confirmBook = confirm(`Book seat #${id} as "${username}"?`);
+              if (!confirmBook) return;
 
-              const res = await fetch(`/${id}/${name}`, { method: "PUT" });
+              const res = await fetch(`/${id}/${encodeURIComponent(username)}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${getToken()}` }
+              });
+
+              if (res.status === 401) { alert('Session expired. Please log in again.'); doLogout(); return; }
+
               const data = await res.json();
 
               if (data.error) {
-                alert("FAILED! Couldn't book! already booked.");
+                alert('FAILED! Seat already booked.');
               } else {
-                alert("Booked successfully!");
-                // Visually transition to booked state upon success
+                alert('Booked successfully!');
                 currentTd.className = `${baseClasses} bg-rose-500/10 text-rose-500/60 border border-rose-500/20 cursor-not-allowed`;
                 currentTd.innerHTML = `
-                            <span class="relative z-10">${id}</span>
-                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-4 py-2 bg-slate-900 border border-slate-700 text-sm text-slate-300 rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap shadow-2xl z-50 pointer-events-none font-normal shadow-[0_10px_25px_rgba(0,0,0,0.5)]">
-                                Booked by: <span class="font-bold text-white ml-1">${name}</span>
-                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-[6px] border-transparent border-t-slate-700"></div>
-                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[2px] border-[5px] border-transparent border-t-slate-900"></div>
-                            </div>
-                        `;
+                  <span class="relative z-10">${id}</span>
+                  <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-4 py-2 bg-slate-900 border border-slate-700 text-sm text-slate-300 rounded-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap shadow-2xl z-50 pointer-events-none font-normal">
+                    Booked by: <span class="font-bold text-white ml-1">${username}</span>
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[1px] border-[6px] border-transparent border-t-slate-700"></div>
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-[2px] border-[5px] border-transparent border-t-slate-900"></div>
+                  </div>`;
               }
             } catch (ex) {
-              alert("error booking " + ex);
+              alert('Error booking: ' + ex);
             }
           });
+
           tr.appendChild(td);
           tbl.appendChild(tr);
         }
       }
-      run();
+
+      // INIT — check existing token on page load
+      (function init() {
+        const token = getToken();
+        const name = localStorage.getItem('username');
+        if (token && name) {
+          showBookingScreen(name);
+        }
+      })();
     </script>
   </body>
 </html>
