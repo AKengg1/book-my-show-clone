@@ -58,7 +58,7 @@ const requireAuth = (req, res, next) => {
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
-
+//register
 app.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -85,6 +85,39 @@ app.post("/register", async (req, res) => {
       [name, email, hashPassword],
     );
     const user = result.rows[0];
+    const token = jwt.sign(
+      { id: user.id, name: user.name, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" },
+    );
+    res.status(201).send({ token, name: user.name, email: user.email });
+  } catch (error) {
+    req.status(500).send({ error: "Internal server error." });
+  }
+});
+
+//login
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password)
+      return res
+        .status(401)
+        .send({ error: "Email and password are required." });
+
+    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
+
+    if (result.rowCount === 0)
+      return res.status(404).send({ error: "Invalid email or password." });
+
+    const user = result.rows[0];
+    const match = bcrypt.compare(password, user.hashPassword);
+
+    if (!match)
+      return res.status(401).json({ error: "Invalid email or password." });
+
     const token = jwt.sign(
       { id: user.id, name: user.name, email: user.email },
       process.env.JWT_SECRET,
