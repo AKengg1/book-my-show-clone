@@ -83,10 +83,10 @@ app.post("/register", async (req, res) => {
       return res.status(409).json({ error: "Email already registered." });
 
     //hash password
-    const hashPassword = await bcrypt.hash(password, 10);
+    const password_hash = await bcrypt.hash(password, 10);
     const result = await pool.query(
-      "INSERT INTO users (name, email, hashPassword) VALUES ($1, $2, $3) RETURNING id, name, email",
-      [name, email, hashPassword],
+      "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, name, email",
+      [name, email, password_hash],
     );
     const user = result.rows[0];
     const token = jwt.sign(
@@ -117,7 +117,7 @@ app.post("/login", async (req, res) => {
       return res.status(404).send({ error: "Invalid email or password." });
 
     const user = result.rows[0];
-    const match = await bcrypt.compare(password, user.hashPassword);
+    const match = await bcrypt.compare(password, user.password_hash);
 
     if (!match)
       return res.status(401).json({ error: "Invalid email or password." });
